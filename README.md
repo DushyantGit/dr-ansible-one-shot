@@ -3,36 +3,69 @@
 Learn Ansible hands-on with real AWS infrastructure provisioned by Terraform.
 Scratch → pro in a single ~4-hour live session.
 
-## Prerequisites
+**The setup mirrors the real world:** one **control node** runs Ansible and manages
+three **worker** nodes over the private network. Your laptop is used only once, to
+bootstrap the control node — then you SSH into the control node and run the whole
+course from there.
+
+```
+your laptop ──(one-time bootstrap)──▶ control-node-ubuntu ──(private network)──▶ worker-ubuntu
+                                          (runs Ansible)                          worker-redhat
+                                                                                  worker-amazon
+```
+
+## Prerequisites (on your laptop)
 
 - [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) (>= 1.6)
-- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) — ansible-core **>= 2.17** (2.21 recommended), needs **Python 3.12+** on the control node
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) (v2)
+- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) — used only for the one-time bootstrap
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) (v2), configured with credentials
+
+(The control node itself gets a current ansible-core installed automatically during bootstrap.)
 
 ---
 
 ## Quick Start
+
+### Phase 1 — from your laptop: provision + bootstrap the control node
 
 ```bash
 # 1. Clone and enter the repo
 git clone https://github.com/TrainWithShubham/ansible-in-one-shot.git
 cd ansible-in-one-shot
 
-# 2. Install the Galaxy collections used by the roles
-ansible-galaxy collection install -r requirements.yml
-
-# 3. Generate SSH key pair (no .pem extension — matches the Terraform default)
+# 2. Generate an SSH key pair (no .pem extension — matches the Terraform default)
 mkdir -p ~/keys
 ssh-keygen -t rsa -b 4096 -f ~/keys/terra-key-ansible -N ""
 chmod 600 ~/keys/terra-key-ansible
 cp ~/keys/terra-key-ansible.pub terraform/terra-key-ansible.pub
 
-# 4. Provision infrastructure (auto-generates the Ansible inventory)
+# 3. Provision the 4 EC2 instances (also writes inventories/dev/hosts.ini + bootstrap.ini)
 cd terraform && terraform init && terraform apply -auto-approve && cd ..
 
-# 5. Test connectivity
-ansible all -m ping
+# 4. Bootstrap the control node: installs Ansible there, pushes your key,
+#    clones the repo, and drops the teaching inventory in place.
+ansible-playbook -i inventories/dev/bootstrap.ini playbooks/bootstrap_control_node.yml
 ```
+
+> The bootstrap clones this repo from GitHub onto the control node, so **push your
+> changes first** if you've edited anything locally.
+
+### Phase 2 — SSH into the control node and run the course
+
+```bash
+# Grab the control node's public IP
+cd terraform && terraform output -raw control_node_public_ip && cd ..
+
+# SSH in (use that IP) and go
+ssh -i ~/keys/terra-key-ansible ubuntu@<CONTROL_NODE_PUBLIC_IP>
+cd ansible-in-one-shot
+
+# You're now on the control node — everything below runs from here
+ansible all -m ping        # control (local) + 3 workers (private IPs)
+ansible workers -m ping
+```
+
+Everything in the modules below is run **from the control node**.
 
 ---
 
@@ -67,9 +100,14 @@ Terraform creates **4 EC2 instances** in `us-west-2` (all `t3.micro`, free-tier 
 
 AMI IDs are region-specific — update them in `terraform/variables.tf` if you change regions.
 
-Terraform auto-generates the Ansible inventory at `inventories/dev/hosts.ini` with these groups:
-`control`, `workers`, `ubuntu`, `redhat`, `amazon` (plus the implicit `all`). Playbooks target
-these groups — e.g. `hosts: ubuntu`, `hosts: workers`.
+Terraform generates **two** inventories:
+
+- `inventories/dev/bootstrap.ini` — used once from your laptop (control node by **public IP**) to run the bootstrap playbook.
+- `inventories/dev/hosts.ini` — the **teaching** inventory used **on the control node**: the control node manages itself (`ansible_connection=local`) and reaches workers by **private IP**.
+
+The teaching inventory exposes these groups (playbooks target them via `hosts:`):
+`control`, `workers`, `ubuntu`, `redhat`, `amazon`, plus the implicit `all`.
+`ubuntu` = control + worker-ubuntu; `workers` = the three worker nodes.
 
 ---
 
@@ -80,9 +118,12 @@ ansible-in-one-shot/
 ├── ansible.cfg                    # Ansible settings (inventory, SSH, output)
 ├── requirements.yml               # Galaxy collections (community.general)
 ├── .ansible-lint                  # Lint config (truthy enforced, FQCN for collections)
-├── terraform/                     # EC2, security groups, auto-inventory
+├── terraform/                     # EC2, security group, auto-inventory
+├── playbooks/
+│   └── bootstrap_control_node.yml # One-time: sets up the control node
 ├── inventories/dev/
-│   ├── hosts.ini                  # Auto-generated by terraform apply
+│   ├── hosts.ini                  # Teaching inventory (generated; on control node)
+│   ├── bootstrap.ini              # Laptop→control bootstrap inventory (generated)
 │   ├── group_vars/                # all, ubuntu, redhat, amazon
 │   └── host_vars/                 # control-node-ubuntu
 ├── roles/                         # common, docker, nginx
@@ -92,6 +133,8 @@ ansible-in-one-shot/
 ---
 
 ## Common Commands
+
+Run these **from the control node** (after Phase 2 above):
 
 ```bash
 # Test connectivity
@@ -123,11 +166,12 @@ ansible-lint
 
 | Problem | Fix |
 |---------|-----|
-| `Permission denied (publickey)` | Check SSH key path (`~/keys/terra-key-ansible`) and `chmod 600` |
-| `No hosts matched` | Run `terraform apply` to regenerate the inventory |
-| `Timeout connecting` | Check security group allows port 22 |
+| Bootstrap: `Permission denied (publickey)` | Key not synced — re-run key-gen step so `terraform/terra-key-ansible.pub` matches `~/keys/terra-key-ansible` |
+| Bootstrap: repo missing your latest changes | The bootstrap clones from GitHub — `git push` first |
+| On control node: `No hosts matched` | The teaching `hosts.ini` wasn't copied — re-run the bootstrap playbook |
+| Workers `UNREACHABLE` from control node | Key must be at `~/keys/terra-key-ansible` on the control node; workers' SG must allow port 22 (it allows intra-VPC by default) |
+| `couldn't resolve module community.general.*` | Run `ansible-galaxy collection install -r requirements.yml` |
 | `become: permission denied` | Default EC2 users have sudo — check your `hosts` line |
-| `couldn't resolve module ansible.builtin.*` | Upgrade to ansible-core >= 2.17 |
 
 ---
 

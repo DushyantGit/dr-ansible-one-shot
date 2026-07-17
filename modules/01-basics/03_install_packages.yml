@@ -12,9 +12,9 @@
         name: tree
         state: present
 
-    - name: Install htop
+    - name: Install wget
       package:
-        name: htop
+        name: wget
         state: present
 
     - name: Install vim

@@ -2,8 +2,6 @@
 base_packages:
   - vim
   - tree
-  - htop
-  - curl
   - wget
 
 web_packages:

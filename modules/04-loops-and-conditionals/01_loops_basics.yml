@@ -9,7 +9,7 @@
   vars:
     packages_to_install:
       - tree
-      - curl
+      - git
       - wget
       - unzip
 

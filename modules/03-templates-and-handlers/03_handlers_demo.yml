@@ -8,11 +8,11 @@
   become: true
 
   vars:
+    # Valid nginx http-context tuning — files in conf.d are parsed by nginx,
+    # so they must be real config or the reload handler will fail.
     app_config_content: |
-      # Application Config
-      app_port=8080
-      log_level=info
-      environment={{ env | default('dev') }}
+      # Application tuning — managed by Ansible (env: {{ env | default('dev') }})
+      client_max_body_size 16m;
 
   tasks:
     - name: Ensure nginx is installed
@@ -31,7 +31,7 @@
 
     - name: Deploy another config file (also notifies same handler)
       copy:
-        content: "# Extra config\nworker_connections 1024;\n"
+        content: "# Extra config\nkeepalive_timeout 65;\n"
         dest: /etc/nginx/conf.d/extra.conf
         mode: '0644'
       notify: Reload Nginx
