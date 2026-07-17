@@ -6,7 +6,7 @@
 #   inventories/dev/group_vars/all.yml     -> env, common_packages
 #   inventories/dev/group_vars/ubuntu.yml  -> package_manager
 #   inventories/dev/group_vars/redhat.yml  -> package_manager
-#   inventories/dev/host_vars/master-ubuntu.yml -> is_master
+#   inventories/dev/host_vars/control-node-ubuntu.yml -> is_master
 
 - name: Read variables from group_vars and host_vars
   hosts: all

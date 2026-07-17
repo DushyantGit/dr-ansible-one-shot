@@ -4,7 +4,7 @@
 
 - name: Create files and directories
   hosts: all
-  become: yes
+  become: true
 
   tasks:
     - name: Create a directory
@@ -26,7 +26,7 @@
     - name: Add a line to the file (idempotent!)
       lineinfile:
         path: /opt/ansible-lab/config.txt
-        line: "last_updated={{ ansible_date_time.date }}"
+        line: "last_updated={{ ansible_facts['date_time']['date'] }}"
         regexp: "^last_updated="
         state: present
 

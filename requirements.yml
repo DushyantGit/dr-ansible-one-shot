@@ -1,10 +1,8 @@
 ---
-roles:
-  - name: geerlingguy.docker
-    version: "7.4.1"
-
+# Install with: ansible-galaxy collection install -r requirements.yml
 collections:
+  # Provides community.general.timezone (used by the common role) and many
+  # other modules. Pinned to the 13.x series (ships with the Ansible 13
+  # community package / ansible-core 2.21).
   - name: community.general
-    version: ">=9.0.0"
-  - name: ansible.posix
-    version: ">=1.6.0"
+    version: ">=13.0.0,<14.0.0"

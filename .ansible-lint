@@ -1,7 +1,13 @@
 ---
+# This course intentionally uses short names for builtin modules (ping, package,
+# debug, ...) to keep playbooks readable while teaching. Modules from collections
+# (e.g. community.general.timezone) are still written with their full FQCN, and
+# ansible-lint still enforces that via the remaining fqcn[action] check.
 skip_list:
-  - yaml[truthy]
+  - fqcn[action-core]
 
+# Guarded ad-hoc commands (systemctl status, cat, docker --version, etc.) are
+# intentional teaching demos, so downgrade these to warnings rather than errors.
 warn_list:
   - no-changed-when
   - command-instead-of-module
@@ -9,4 +15,3 @@ warn_list:
 exclude_paths:
   - .git/
   - terraform/
-  - solutions/

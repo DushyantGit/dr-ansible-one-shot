@@ -9,7 +9,7 @@
 
 - name: Install and configure nginx with tags
   hosts: ubuntu
-  become: yes
+  become: true
 
   tasks:
     - name: Install nginx
@@ -37,7 +37,7 @@
 
     - name: Deploy index page
       copy:
-        content: "<h1>Tagged deployment on {{ ansible_hostname }}</h1>"
+        content: "<h1>Tagged deployment on {{ ansible_facts['hostname'] }}</h1>"
         dest: /var/www/html/tagged.html
         mode: '0644'
       tags:

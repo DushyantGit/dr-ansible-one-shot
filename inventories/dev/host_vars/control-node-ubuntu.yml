@@ -1,0 +1,3 @@
+---
+# Applies only to the control-node-ubuntu host.
+is_master: true

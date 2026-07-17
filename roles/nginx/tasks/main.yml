@@ -3,21 +3,21 @@
   package:
     name: nginx
     state: present
-  become: yes
+  become: true
 
 - name: Create web root directory
   file:
     path: "{{ nginx_root }}"
     state: directory
     mode: '0755'
-  become: yes
+  become: true
 
 - name: Deploy nginx site configuration
   template:
     src: default_site.conf.j2
     dest: /etc/nginx/conf.d/default_site.conf
     mode: '0644'
-  become: yes
+  become: true
   notify: Reload Nginx
 
 - name: Deploy index page
@@ -25,11 +25,11 @@
     src: index.html.j2
     dest: "{{ nginx_root }}/index.html"
     mode: '0644'
-  become: yes
+  become: true
 
 - name: Start and enable nginx
   service:
     name: nginx
     state: started
     enabled: true
-  become: yes
+  become: true

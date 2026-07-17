@@ -2,7 +2,7 @@ resource "aws_instance" "my_instance" {
   for_each = var.instances
 
   ami             = each.value.ami
-  instance_type   = var.instance_type
+  instance_type   = each.value.instance_type
   key_name        = aws_key_pair.ansible.key_name
   security_groups = [aws_security_group.ansible_lab.name]
 

@@ -4,7 +4,7 @@ galaxy_info:
   author: TrainWithShubham
   description: Install and configure Nginx web server with templated config
   license: MIT
-  min_ansible_version: "2.16"
+  min_ansible_version: "2.17"
   platforms:
     - name: Ubuntu
       versions:

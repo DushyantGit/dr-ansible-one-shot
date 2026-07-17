@@ -12,7 +12,7 @@
 | 1 | `01_simple_variables.yml` | Inline vars, `{{ }}` syntax, YAML quoting |
 | 2 | `02_register_debug.yml` | register, debug, return values (.stdout, .rc) |
 | 3 | `03_host_group_vars.yml` | group_vars, host_vars from inventory |
-| 4 | `04_facts_conditionals.yml` | when + ansible_os_family, fact-based logic |
+| 4 | `04_facts_conditionals.yml` | when + `ansible_facts['os_family']`, fact-based logic |
 
 ## How to Run
 
@@ -26,3 +26,4 @@ ansible-playbook modules/02-variables-and-facts/04_facts_conditionals.yml -v
 - Variable precedence: command line > play vars > host_vars > group_vars > defaults
 - `register` stores the entire result object — use `.stdout`, `.rc`, `.changed` to access parts
 - `when` conditions are raw Jinja2 — no `{{ }}` needed inside `when`
+- Read facts via `ansible_facts['os_family']`, not the bare `ansible_os_family` — the bare form is being phased out (defaults off in ansible-core 2.24)

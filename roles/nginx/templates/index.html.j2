@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ ansible_hostname }} | Ansible Managed</title>
+    <title>{{ ansible_facts['hostname'] }} | Ansible Managed</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; text-align: center; }
         .info { background: #f0f0f0; padding: 20px; border-radius: 8px; margin: 20px 0; }
@@ -12,9 +12,9 @@
 <body>
     <h1>Ansible Lab Server</h1>
     <div class="info">
-        <p><strong>Hostname:</strong> {{ ansible_hostname }}</p>
-        <p><strong>IP Address:</strong> {{ ansible_default_ipv4.address }}</p>
-        <p><strong>OS:</strong> {{ ansible_distribution }} {{ ansible_distribution_version }}</p>
+        <p><strong>Hostname:</strong> {{ ansible_facts['hostname'] }}</p>
+        <p><strong>IP Address:</strong> {{ ansible_facts['default_ipv4']['address'] }}</p>
+        <p><strong>OS:</strong> {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}</p>
         <p><strong>Environment:</strong> {{ env | default('unknown') }}</p>
     </div>
     <p>Deployed with Ansible | TrainWithShubham</p>

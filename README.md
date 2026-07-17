@@ -1,11 +1,12 @@
 # Ansible In One Shot — TrainWithShubham
 
 Learn Ansible hands-on with real AWS infrastructure provisioned by Terraform.
+Scratch → pro in a single ~4-hour live session.
 
 ## Prerequisites
 
 - [Terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli) (>= 1.6)
-- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) (>= 2.16)
+- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) — ansible-core **>= 2.17** (2.21 recommended), needs **Python 3.12+** on the control node
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) (v2)
 
 ---
@@ -17,16 +18,19 @@ Learn Ansible hands-on with real AWS infrastructure provisioned by Terraform.
 git clone https://github.com/TrainWithShubham/ansible-in-one-shot.git
 cd ansible-in-one-shot
 
-# 2. Generate SSH key pair
-mkdir -p ~/keys
-ssh-keygen -t rsa -b 4096 -f ~/keys/terra-key-ansible.pem -N ""
-chmod 400 ~/keys/terra-key-ansible.pem
-cp ~/keys/terra-key-ansible.pem.pub terraform/terra-key-ansible.pub
+# 2. Install the Galaxy collections used by the roles
+ansible-galaxy collection install -r requirements.yml
 
-# 3. Provision infrastructure
+# 3. Generate SSH key pair (no .pem extension — matches the Terraform default)
+mkdir -p ~/keys
+ssh-keygen -t rsa -b 4096 -f ~/keys/terra-key-ansible -N ""
+chmod 600 ~/keys/terra-key-ansible
+cp ~/keys/terra-key-ansible.pub terraform/terra-key-ansible.pub
+
+# 4. Provision infrastructure (auto-generates the Ansible inventory)
 cd terraform && terraform init && terraform apply -auto-approve && cd ..
 
-# 4. Test connectivity
+# 5. Test connectivity
 ansible all -m ping
 ```
 
@@ -34,33 +38,38 @@ ansible all -m ping
 
 ## Course Modules
 
-| # | Module | What You'll Learn | Est. Time |
-|---|--------|-------------------|-----------|
-| 1 | [Basics](modules/01-basics/) | Ad-hoc commands, playbooks, packages, services | 2h |
-| 2 | [Variables & Facts](modules/02-variables-and-facts/) | vars, register, debug, group_vars, when conditionals | 2h |
-| 3 | [Templates & Handlers](modules/03-templates-and-handlers/) | Jinja2 templates, handlers, notify | 1.5h |
-| 4 | [Loops & Conditionals](modules/04-loops-and-conditionals/) | loop, when, block/rescue/always, tags | 1.5h |
-| 5 | [Roles](modules/05-roles/) | Role structure, site.yml, reusable automation | 2h |
-| 6 | [Vault](modules/06-vault/) | ansible-vault, encrypting secrets, no_log | 1h |
+Live-paced timings for a single ~4-hour session (the last live run covered this in ~4.5h).
+Each module has its own README with commands to run.
 
-**Total: ~10 hours** — Each module has its own README with commands to run.
+| # | Module | What You'll Learn | Live Time |
+|---|--------|-------------------|-----------|
+| 1 | [Basics](modules/01-basics/) | Ad-hoc commands, playbooks, packages, services, FQCN | 45m |
+| 2 | [Variables & Facts](modules/02-variables-and-facts/) | vars, register, debug, group_vars, `ansible_facts[]`, when | 40m |
+| 3 | [Templates & Handlers](modules/03-templates-and-handlers/) | Jinja2 templates, handlers, notify | 30m |
+| 4 | [Loops & Conditionals](modules/04-loops-and-conditionals/) | loop, when, block/rescue/always, tags | 30m |
+| 5 | [Roles](modules/05-roles/) | Role structure, site.yml, reusable automation | 50m |
+| 6 | [Vault](modules/06-vault/) | ansible-vault, encrypting secrets, no_log | 25m |
+
+**Total: ~4 hours** including ~20m setup and Q&A/buffer.
 
 ---
 
 ## Infrastructure
 
-Terraform creates **4 EC2 instances** in `us-west-2` (all `t2.micro`, free tier eligible):
+Terraform creates **4 EC2 instances** in `us-west-2` (all `t3.micro`, free-tier eligible):
 
-| Host | OS | SSH User |
-|------|----|----------|
-| `master-ubuntu` | Ubuntu 24.04 | `ubuntu` |
-| `worker-ubuntu` | Ubuntu 24.04 | `ubuntu` |
-| `worker-redhat` | RHEL 9 | `ec2-user` |
-| `worker-amazon` | Amazon Linux 2023 | `ec2-user` |
+| Host | OS | SSH User | Role group |
+|------|----|----------|------------|
+| `control-node-ubuntu` | Ubuntu 24.04 | `ubuntu` | `control` |
+| `worker-ubuntu` | Ubuntu 24.04 | `ubuntu` | `workers` |
+| `worker-redhat` | RHEL 9 | `ec2-user` | `workers` |
+| `worker-amazon` | Amazon Linux 2023 | `ec2-user` | `workers` |
 
 AMI IDs are region-specific — update them in `terraform/variables.tf` if you change regions.
 
-Terraform auto-generates the Ansible inventory at `inventories/dev/hosts.ini`.
+Terraform auto-generates the Ansible inventory at `inventories/dev/hosts.ini` with these groups:
+`control`, `workers`, `ubuntu`, `redhat`, `amazon` (plus the implicit `all`). Playbooks target
+these groups — e.g. `hosts: ubuntu`, `hosts: workers`.
 
 ---
 
@@ -68,13 +77,16 @@ Terraform auto-generates the Ansible inventory at `inventories/dev/hosts.ini`.
 
 ```
 ansible-in-one-shot/
-├── ansible.cfg               # Ansible settings (inventory, SSH, output)
-├── requirements.yml          # Galaxy dependencies
-├── terraform/                # EC2, security groups, auto-inventory
-├── inventories/dev/          # Inventory + group_vars + host_vars
-├── roles/                    # common, docker, nginx
-├── modules/                  # 6 learning modules (start here!)
-└── solutions/                # Exercises + hints
+├── ansible.cfg                    # Ansible settings (inventory, SSH, output)
+├── requirements.yml               # Galaxy collections (community.general)
+├── .ansible-lint                  # Lint config (truthy enforced, FQCN for collections)
+├── terraform/                     # EC2, security groups, auto-inventory
+├── inventories/dev/
+│   ├── hosts.ini                  # Auto-generated by terraform apply
+│   ├── group_vars/                # all, ubuntu, redhat, amazon
+│   └── host_vars/                 # control-node-ubuntu
+├── roles/                         # common, docker, nginx
+└── modules/                       # 6 learning modules (start here!)
 ```
 
 ---
@@ -84,6 +96,10 @@ ansible-in-one-shot/
 ```bash
 # Test connectivity
 ansible all -m ping
+
+# Target a group
+ansible ubuntu -m ping
+ansible workers -a "uptime"
 
 # Run a playbook
 ansible-playbook modules/01-basics/01_ping.yml
@@ -96,6 +112,9 @@ ansible-playbook modules/04-loops-and-conditionals/05_tags_demo.yml --tags insta
 
 # Dry run (check mode)
 ansible-playbook modules/01-basics/03_install_packages.yml --check
+
+# Lint the content
+ansible-lint
 ```
 
 ---
@@ -104,10 +123,11 @@ ansible-playbook modules/01-basics/03_install_packages.yml --check
 
 | Problem | Fix |
 |---------|-----|
-| `Permission denied (publickey)` | Check SSH key path and `chmod 400` |
-| `No hosts matched` | Run `terraform apply` to generate inventory |
+| `Permission denied (publickey)` | Check SSH key path (`~/keys/terra-key-ansible`) and `chmod 600` |
+| `No hosts matched` | Run `terraform apply` to regenerate the inventory |
 | `Timeout connecting` | Check security group allows port 22 |
 | `become: permission denied` | Default EC2 users have sudo — check your `hosts` line |
+| `couldn't resolve module ansible.builtin.*` | Upgrade to ansible-core >= 2.17 |
 
 ---
 

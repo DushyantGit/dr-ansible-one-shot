@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ ansible_hostname }} | Ansible Lab</title>
+    <title>{{ ansible_facts['hostname'] }} | Ansible Lab</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; text-align: center; background: #f5f5f5; }
         .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin: 20px 0; }
@@ -17,12 +17,12 @@
     <div class="card">
         <h1>Ansible Lab Server</h1>
         <table>
-            <tr><td class="label">Hostname</td><td class="value">{{ ansible_hostname }}</td></tr>
-            <tr><td class="label">IP Address</td><td class="value">{{ ansible_default_ipv4.address }}</td></tr>
-            <tr><td class="label">OS</td><td class="value">{{ ansible_distribution }} {{ ansible_distribution_version }}</td></tr>
-            <tr><td class="label">Kernel</td><td class="value">{{ ansible_kernel }}</td></tr>
-            <tr><td class="label">CPUs</td><td class="value">{{ ansible_processor_vcpus }}</td></tr>
-            <tr><td class="label">RAM</td><td class="value">{{ ansible_memtotal_mb }} MB</td></tr>
+            <tr><td class="label">Hostname</td><td class="value">{{ ansible_facts['hostname'] }}</td></tr>
+            <tr><td class="label">IP Address</td><td class="value">{{ ansible_facts['default_ipv4']['address'] }}</td></tr>
+            <tr><td class="label">OS</td><td class="value">{{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}</td></tr>
+            <tr><td class="label">Kernel</td><td class="value">{{ ansible_facts['kernel'] }}</td></tr>
+            <tr><td class="label">CPUs</td><td class="value">{{ ansible_facts['processor_vcpus'] }}</td></tr>
+            <tr><td class="label">RAM</td><td class="value">{{ ansible_facts['memtotal_mb'] }} MB</td></tr>
             <tr><td class="label">Environment</td><td class="value">{{ env | default('unknown') }}</td></tr>
         </table>
     </div>

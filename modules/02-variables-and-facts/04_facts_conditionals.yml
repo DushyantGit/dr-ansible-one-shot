@@ -8,29 +8,29 @@
   tasks:
     - name: Print OS family
       debug:
-        msg: "OS Family: {{ ansible_os_family }}"
+        msg: "OS Family: {{ ansible_facts['os_family'] }}"
 
     - name: This runs only on Debian/Ubuntu
       debug:
         msg: "This is a Debian-based system (Ubuntu)"
-      when: ansible_os_family == "Debian"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: This runs only on RedHat
       debug:
         msg: "This is a RedHat-based system"
-      when: ansible_os_family == "RedHat"
+      when: ansible_facts['os_family'] == "RedHat"
 
     - name: Update apt cache (Ubuntu only)
       apt:
         update_cache: true
-      when: ansible_os_family == "Debian"
-      become: yes
+      when: ansible_facts['os_family'] == "Debian"
+      become: true
 
     - name: Print message based on memory
       debug:
         msg: >
-          {% if ansible_memtotal_mb > 2048 %}
-          This server has plenty of RAM ({{ ansible_memtotal_mb }} MB)
+          {% if ansible_facts['memtotal_mb'] > 2048 %}
+          This server has plenty of RAM ({{ ansible_facts['memtotal_mb'] }} MB)
           {% else %}
-          This server has limited RAM ({{ ansible_memtotal_mb }} MB)
+          This server has limited RAM ({{ ansible_facts['memtotal_mb'] }} MB)
           {% endif %}

@@ -4,7 +4,7 @@
 
 - name: Deploy dynamic MOTD
   hosts: all
-  become: yes
+  become: true
 
   tasks:
     - name: Deploy MOTD from template

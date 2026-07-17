@@ -4,7 +4,7 @@
 
 - name: Create config files using dictionary loops
   hosts: all
-  become: yes
+  become: true
 
   vars:
     config_files:
@@ -23,11 +23,13 @@
       file:
         path: /tmp/ansible-lab
         state: directory
+        mode: '0755'
 
     - name: Create config files from dictionary
       copy:
         content: "{{ item.content }}\n"
         dest: "{{ item.dest }}/{{ item.name }}"
+        mode: '0644'
       loop: "{{ config_files }}"
       loop_control:
         label: "{{ item.name }}"

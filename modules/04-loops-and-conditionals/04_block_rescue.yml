@@ -4,7 +4,7 @@
 
 - name: Handle errors with block/rescue/always
   hosts: ubuntu
-  become: yes
+  become: true
 
   tasks:
     - name: Try to perform a risky operation
@@ -25,7 +25,7 @@
 
         - name: Log the failure
           copy:
-            content: "Service start failed at {{ ansible_date_time.iso8601 }}\n"
+            content: "Service start failed at {{ ansible_facts['date_time']['iso8601'] }}\n"
             dest: /tmp/ansible-error.log
             mode: '0644'
 

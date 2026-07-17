@@ -5,14 +5,14 @@
 # Play 1: Common setup on ALL servers
 - name: Apply common configuration to all servers
   hosts: all
-  become: yes
+  become: true
   roles:
     - common
 
 # Play 2: Docker on all servers
 - name: Install Docker on all servers
   hosts: all
-  become: yes
+  become: true
   roles:
     - role: docker
       docker_users:
@@ -21,7 +21,7 @@
 # Play 3: Nginx on Ubuntu servers only
 - name: Deploy web server on Ubuntu hosts
   hosts: ubuntu
-  become: yes
+  become: true
   roles:
     - role: nginx
       nginx_listen_port: 80

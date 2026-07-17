@@ -1,15 +1,15 @@
 ---
 - name: Include OS-specific tasks
-  include_tasks: "{{ ansible_os_family | lower }}.yml"
+  include_tasks: "{{ ansible_facts['os_family'] | lower }}.yml"
 
 - name: Set timezone
-  timezone:
+  community.general.timezone:
     name: "{{ common_timezone }}"
-  become: yes
+  become: true
 
 - name: Deploy MOTD
   template:
     src: motd.j2
     dest: /etc/motd
     mode: '0644'
-  become: yes
+  become: true

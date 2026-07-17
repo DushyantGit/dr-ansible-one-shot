@@ -10,7 +10,7 @@
 ## Prerequisites
 - Infrastructure provisioned with Terraform (`cd terraform && terraform apply`)
 - Inventory auto-generated at `inventories/dev/hosts.ini`
-- SSH key configured at `~/keys/terra-key-ansible.pem`
+- SSH key configured at `~/keys/terra-key-ansible`
 
 ## Ad-Hoc Commands (Try these first!)
 
@@ -22,7 +22,7 @@ ansible all -m ping
 ansible all -m setup -a "filter=ansible_distribution*"
 
 # Check memory on a specific host
-ansible master-ubuntu -a "free -h"
+ansible control-node-ubuntu -a "free -h"
 
 # Check disk space on all workers
 ansible workers -a "df -h"
@@ -55,4 +55,5 @@ ansible-playbook modules/01-basics/02_gather_facts.yml -v
 - Ansible is **agentless** — it connects via SSH, no software needed on target servers
 - Playbooks are **idempotent** — running them twice produces the same result
 - The `package` module auto-detects apt/dnf — use it instead of `apt` or `dnf` for cross-OS playbooks
-- `become: yes` is needed for tasks that require root privileges
+- `become: true` is needed for tasks that require root privileges
+- Short module names (`package`, `debug`) work fine for built-in modules. For modules that come from a **collection**, use the full name (FQCN) — e.g. `community.general.timezone` — so Ansible knows where to find them

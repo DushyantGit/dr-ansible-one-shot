@@ -1,0 +1,12 @@
+---
+# Applies to every host in the inventory.
+# group_vars/<group>.yml is auto-loaded by Ansible relative to the inventory file.
+
+env: dev
+
+common_packages:
+  - vim
+  - tree
+  - htop
+  - curl
+  - wget

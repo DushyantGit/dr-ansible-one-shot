@@ -9,9 +9,9 @@ server {
     index index.html;
 
     # Server info
-    # Hostname: {{ ansible_hostname }}
-    # OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
-    # CPUs: {{ ansible_processor_vcpus }}
+    # Hostname: {{ ansible_facts['hostname'] }}
+    # OS: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
+    # CPUs: {{ ansible_facts['processor_vcpus'] }}
 
     location / {
         try_files $uri $uri/ =404;

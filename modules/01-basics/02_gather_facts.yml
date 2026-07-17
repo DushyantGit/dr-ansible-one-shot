@@ -1,6 +1,10 @@
 ---
 # Playbook 2: Explore Ansible facts
 # Run: ansible-playbook modules/01-basics/02_gather_facts.yml
+#
+# Note: we read facts via ansible_facts['...'] (the modern, future-proof form)
+# instead of the bare ansible_* variables — the bare form is being phased out
+# (INJECT_FACTS_AS_VARS defaults to False in ansible-core 2.24).
 
 - name: Explore Ansible facts
   hosts: all
@@ -8,19 +12,19 @@
   tasks:
     - name: Print the OS distribution
       debug:
-        msg: "This server runs {{ ansible_distribution }} {{ ansible_distribution_version }}"
+        msg: "This server runs {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
 
     - name: Print the IP address
       debug:
-        msg: "IP address is {{ ansible_default_ipv4.address }}"
+        msg: "IP address is {{ ansible_facts['default_ipv4']['address'] }}"
 
     - name: Print total memory
       debug:
-        msg: "Total RAM: {{ ansible_memtotal_mb }} MB"
+        msg: "Total RAM: {{ ansible_facts['memtotal_mb'] }} MB"
 
     - name: Print number of CPUs
       debug:
-        msg: "CPUs: {{ ansible_processor_vcpus }}"
+        msg: "CPUs: {{ ansible_facts['processor_vcpus'] }}"
 
     - name: Print all facts (careful — lots of output!)
       debug:

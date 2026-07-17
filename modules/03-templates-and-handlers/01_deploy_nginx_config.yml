@@ -4,11 +4,11 @@
 
 - name: Deploy Nginx with templates
   hosts: ubuntu
-  become: yes
+  become: true
 
   vars:
     nginx_port: 80
-    server_name: "{{ ansible_hostname }}"
+    server_name: "{{ ansible_facts['hostname'] }}"
 
   tasks:
     - name: Install nginx

@@ -1,6 +1,3 @@
 ---
-- name: Restart chronyd
-  service:
-    name: chronyd
-    state: restarted
-  become: yes
+# No handlers are needed by the common role.
+# (Left as a placeholder so the standard role layout stays intact.)

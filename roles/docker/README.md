@@ -18,7 +18,7 @@ Installs and configures Docker across Ubuntu, RHEL, and Amazon Linux.
 
 ```yaml
 - hosts: all
-  become: yes
+  become: true
   roles:
     - role: docker
       docker_users:

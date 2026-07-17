@@ -4,7 +4,7 @@
 
 - name: Multi-OS conditional blocks
   hosts: all
-  become: yes
+  become: true
 
   tasks:
     - name: Debian/Ubuntu specific tasks
@@ -16,16 +16,16 @@
 
         - name: Print Debian message
           debug:
-            msg: "Running on {{ ansible_distribution }} {{ ansible_distribution_version }}"
-      when: ansible_os_family == "Debian"
+            msg: "Running on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: RedHat/Amazon specific tasks
       block:
         - name: Print RedHat message
           debug:
-            msg: "Running on {{ ansible_distribution }} {{ ansible_distribution_version }}"
-      when: ansible_os_family == "RedHat"
+            msg: "Running on {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
+      when: ansible_facts['os_family'] == "RedHat"
 
     - name: Common tasks for all OS
       debug:
-        msg: "OS family: {{ ansible_os_family }}, Package manager: {{ package_manager }}"
+        msg: "OS family: {{ ansible_facts['os_family'] }}, Package manager: {{ package_manager }}"

@@ -32,42 +32,6 @@ resource "aws_security_group" "ansible_lab" {
     description = "HTTPS"
   }
 
-  # Application port
-  ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Application (Flask/custom app)"
-  }
-
-  # Node Exporter
-  ingress {
-    from_port   = 9100
-    to_port     = 9100
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Node Exporter (monitoring)"
-  }
-
-  # Prometheus
-  ingress {
-    from_port   = 9090
-    to_port     = 9090
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Prometheus"
-  }
-
-  # Grafana
-  ingress {
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Grafana"
-  }
-
   # All outbound
   egress {
     from_port   = 0

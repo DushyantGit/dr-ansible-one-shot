@@ -1,0 +1,3 @@
+---
+# Applies to hosts in the [amazon] group.
+package_manager: dnf

@@ -1,14 +1,14 @@
 ============================================
       ANSIBLE MANAGED SERVER
 ============================================
-  Hostname    : {{ ansible_hostname }}
-  IP Address  : {{ ansible_default_ipv4.address }}
-  OS          : {{ ansible_distribution }} {{ ansible_distribution_version }}
-  Kernel      : {{ ansible_kernel }}
-  CPUs        : {{ ansible_processor_vcpus }}
-  RAM         : {{ ansible_memtotal_mb }} MB
+  Hostname    : {{ ansible_facts['hostname'] }}
+  IP Address  : {{ ansible_facts['default_ipv4']['address'] }}
+  OS          : {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
+  Kernel      : {{ ansible_facts['kernel'] }}
+  CPUs        : {{ ansible_facts['processor_vcpus'] }}
+  RAM         : {{ ansible_facts['memtotal_mb'] }} MB
   Environment : {{ env | default('unknown') }}
-  Last Deploy : {{ ansible_date_time.date }}
+  Last Deploy : {{ ansible_facts['date_time']['date'] }}
 ============================================
   Managed by Ansible | TrainWithShubham
 ============================================

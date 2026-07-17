@@ -3,10 +3,10 @@
   apt:
     update_cache: true
     cache_valid_time: 3600
-  become: yes
+  become: true
 
 - name: Install common packages (Debian/Ubuntu)
   apt:
     name: "{{ common_packages }}"
     state: present
-  become: yes
+  become: true
