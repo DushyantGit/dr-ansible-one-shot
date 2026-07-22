@@ -1,0 +1,19 @@
+- name: Install packages
+  hosts: workers
+  become: true
+
+  vars_files:
+    - vars/packages.yml
+
+  tasks:
+    - name: Update ubuntu Cache  
+      apt:
+        update_cache: true
+      when: ansible_os_family == "ubuntu, amazon"
+
+    - name: Install packages
+      package:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ base_packages }}"
+~                                  
